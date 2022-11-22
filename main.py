@@ -2,7 +2,7 @@ import pygame as pg
 import random as r
 
 # TODO:
-# Make the fruit "Big Hero" themed
+# Make the fruit "Big Hero" themed (using baymax.png)
 
 pg.init()
 
