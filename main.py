@@ -2,7 +2,9 @@ import pygame as pg
 import random as r
 
 # TODO:
-# Make the fruit "Big Hero" themed (using baymax.png)
+# Get better image for fruit
+# Make snake head look like baymax
+# Get better colour for border
 
 pg.init()
 
@@ -47,7 +49,11 @@ fruitPosition = generateFruitPosition()
 
 
 def renderFruit():
-    pg.draw.rect(screen, RED, (fruitPosition[0], fruitPosition[1], 30, 30))
+    fruitImg = pg.image.load('baymax.png')
+    # Scale down image
+    fruitImg = pg.transform.scale(fruitImg, (30, 30))
+    # Render image to screen
+    screen.blit(fruitImg, (fruitPosition[0], fruitPosition[1]))
 
 
 def moveSnake(addNode):
