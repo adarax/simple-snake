@@ -72,7 +72,7 @@ def moveSnake(addNode):
     # If the snake has eaten the fruit, don't remove the tail
     # Otherwise, remove the tail
     # This simulates movement of the snake
-    if (addNode == False):
+    if not addNode:
         snake.pop()
 
 
