@@ -133,26 +133,6 @@ def renderScreen():
     showScore()
     pg.display.update()
 
-
-# Doesn't care about turning 180 degrees tho...
-def cheapAI():
-    go = None
-
-    if fruitPosition[1] > snakeHeadPosition[1]:
-        go = 'D'
-    else:
-        go = 'U'
-
-    if snakeHeadPosition[1] == fruitPosition[1]:
-        if snakeHeadPosition[0] < fruitPosition[0]:
-            go = 'R'
-        else:
-            go = 'L'
-
-    return go
-
-
-
 while run:
     pg.time.delay(50)
 
@@ -180,9 +160,6 @@ while run:
 
     if keys[pg.K_p] and pause:
         pause = False
-
-    # AI navigation system at its finest
-    # direction = cheapAI()
 
     if not pause:
         moveSnake(checkFruitEaten())
