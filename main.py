@@ -1,9 +1,6 @@
 import pygame as pg
 import random as r
 
-# TODO:
-# Make snake head look like baymax
-
 pg.init()
 
 # Colors
@@ -26,9 +23,18 @@ snake = [
     snakeHeadPosition
 ]
 
-def renderSnake():
+def renderSnake():   
     for node in snake:
+        # Uses images of baymax to render snake (drawback is that it's slow)
+
+        # baymaxImg = pg.image.load("baymax_snake_head.png")
+        # # Scale down image
+        # baymaxImg = pg.transform.scale(baymaxImg, (30, 30))
+        # # Render image to screen
+        # screen.blit(baymaxImg, (node[0], node[1]))
+
         pg.draw.rect(screen, GREEN, (node[0], node[1], 30, 30))
+
 
 
 def generateFruitPosition():
