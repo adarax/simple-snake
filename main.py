@@ -47,7 +47,7 @@ fruitPosition = generateFruitPosition()
 
 
 def renderFruit():
-    fruitImg = pg.image.load('baymax.png')
+    fruitImg = pg.image.load('baymax_fruit.png')
     # Scale down image
     fruitImg = pg.transform.scale(fruitImg, (30, 30))
     # Render image to screen
@@ -116,11 +116,11 @@ def showScore():
     screen.blit(text, textRect)
 
 
-def renderBorder():
-    pg.draw.rect(screen, GREEN, (0, 0, screen.get_width(), 5))
-    pg.draw.rect(screen, GREEN, (0, 0, 5, screen.get_height()))
-    pg.draw.rect(screen, GREEN, (screen.get_width() - 5, 0, 5, screen.get_height()))
-    pg.draw.rect(screen, GREEN, (0, screen.get_height() - 5, screen.get_width(), 5))
+def renderBorder(color=GREEN):
+    pg.draw.rect(screen, color, (0, 0, screen.get_width(), 5))
+    pg.draw.rect(screen, color, (0, 0, 5, screen.get_height()))
+    pg.draw.rect(screen, color, (screen.get_width() - 5, 0, 5, screen.get_height()))
+    pg.draw.rect(screen, color, (0, screen.get_height() - 5, screen.get_width(), 5))
 
 
 def renderScreen():
@@ -132,7 +132,7 @@ def renderScreen():
     pg.display.update()
 
 def start():
-    global direction, pause, lastDirection, snakeHeadPosition, snake, fruitPosition, run, quit, screen, offset, GREEN, RED, BLACK, WHITE
+    global direction, pause, snakeHeadPosition, snake, fruitPosition, run, quit
     direction = None
     pause = False
     snakeHeadPosition = [300, 300]
@@ -142,6 +142,9 @@ def start():
     fruitPosition = generateFruitPosition()
     run = True
     quit = False
+
+# Part of pause feature
+lastDirection = None
 
 while run:
     pg.time.delay(50)
@@ -168,12 +171,15 @@ while run:
         elif keys[pg.K_LEFT] and direction != 'R':
             direction = 'L'
 
-    lastDirection = direction
+    if direction is not None:
+        lastDirection = direction
 
     if keys[pg.K_SPACE] and not pause:
+        direction = None
         pause = True
 
     if keys[pg.K_p] and pause:
+        direction = lastDirection
         pause = False
 
     if not pause:
@@ -190,6 +196,7 @@ while run:
     
     # Check if hit wall
     if run:
+        renderBorder(RED)
         run = not checkWallCollision()
 
     # Check for exit condition (to display game over message)
@@ -216,5 +223,4 @@ while run:
 if run:
     start()
 else:
-
     pg.quit()
