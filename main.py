@@ -18,6 +18,7 @@ run = True
 direction = None
 offset = 30
 pause = False
+quit = False
 
 # Snake
 snakeHeadPosition = [300, 300]
@@ -29,8 +30,7 @@ def renderSnake():
     for node in snake:
         pg.draw.rect(screen, GREEN, (node[0], node[1], 30, 30))
 
-# There's a very small chance the fruit will render on the same block twice
-# But honestly if you're that lucky, you deserve the extra point!
+
 def generateFruitPosition():
     x = 0
     y = 0
@@ -132,7 +132,7 @@ def renderScreen():
     pg.display.update()
 
 def start():
-    global direction, pause, lastDirection, snakeHeadPosition, snake, fruitPosition, run, screen, offset, GREEN, RED, BLACK, WHITE
+    global direction, pause, lastDirection, snakeHeadPosition, snake, fruitPosition, run, quit, screen, offset, GREEN, RED, BLACK, WHITE
     direction = None
     pause = False
     snakeHeadPosition = [300, 300]
@@ -141,14 +141,20 @@ def start():
     ]
     fruitPosition = generateFruitPosition()
     run = True
+    quit = False
 
 while run:
     pg.time.delay(50)
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
+            quit = True
             run = False
             break
+
+    # Fix to issue where exit button doesn't work
+    if quit:
+        break
 
     keys = pg.key.get_pressed()
 
@@ -209,4 +215,6 @@ while run:
 
 if run:
     start()
-pg.quit()
+else:
+
+    pg.quit()
