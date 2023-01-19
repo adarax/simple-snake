@@ -2,9 +2,7 @@ import pygame as pg
 import random as r
 
 # TODO:
-# Get better image for fruit
 # Make snake head look like baymax
-# Get better colour for border
 
 pg.init()
 
@@ -133,6 +131,17 @@ def renderScreen():
     showScore()
     pg.display.update()
 
+def start():
+    global direction, pause, lastDirection, snakeHeadPosition, snake, fruitPosition, run, screen, offset, GREEN, RED, BLACK, WHITE
+    direction = None
+    pause = False
+    snakeHeadPosition = [300, 300]
+    snake = [
+        snakeHeadPosition
+    ]
+    fruitPosition = generateFruitPosition()
+    run = True
+
 while run:
     pg.time.delay(50)
 
@@ -172,17 +181,32 @@ while run:
 
     # Check if hit tail
     run = not checkTailCollision()
+    
     # Check if hit wall
     if run:
         run = not checkWallCollision()
 
     # Check for exit condition (to display game over message)
     if not run:
-        writeMessage("Game over")
-        pg.display.update()
-        pg.time.delay(1000)
+        decide = True
 
-    pg.event.clear()
+        while decide:
+            writeMessage("Game over. Press ENTER to restart or ESC to exit")
+            pg.display.update()
 
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    decide = False
+                    break
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        decide = False
+                        start()
+                        break
+                    if event.key == pg.K_ESCAPE:
+                        decide = False
+                        break
 
+if run:
+    start()
 pg.quit()
