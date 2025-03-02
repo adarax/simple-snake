@@ -14,13 +14,14 @@ screen = pg.display.set_mode((900, 600), pg.RESIZABLE)
 clock = pg.time.Clock()
 run = True
 pause = False
+score = 0
 
 # Snake
 snake_head_position = []
 snake = []
 snake_direction = None
 last_direction = None  # Used to store the last direction the snake was moving in
-offset = 30
+offset = 30  # Side length of each snake node, and of the fruit
 
 # Fruit
 fruit_position = []
@@ -36,8 +37,7 @@ def reset_game():
     # Reset snake variables
     snake_head_position = [300, 300]
     snake = [
-        snake_head_position, [snake_head_position[0] - offset, snake_head_position[1]], [
-            snake_head_position[0] - 2 * offset, snake_head_position[1]]
+        snake_head_position
     ]
     snake_direction = None
     last_direction = None
@@ -93,18 +93,19 @@ def move_snake(add_node):
 
 
 def check_fruit_eaten():
-    global fruit_position
+    global fruit_position, score
 
     if snake_head_position[0] == fruit_position[0] and snake_head_position[1] == fruit_position[1]:
         fruit_position = generate_fruit_position()
         render_fruit()
+        score += 1
         return True
     else:
         return False
 
 
 def check_wall_collision():
-    if snake_head_position[0] <= 0 or snake_head_position[0] >= screen.get_width() - 30 or snake_head_position[1] <= 0 or snake_head_position[1] >= screen.get_height() - 30:
+    if snake_head_position[0] <= 0 or snake_head_position[0] >= screen.get_width() - offset or snake_head_position[1] <= 0 or snake_head_position[1] >= screen.get_height() - offset:
         return True
     else:
         return False
@@ -127,7 +128,7 @@ def write_message_to_screen(text):
 
 def show_score():
     font = pg.font.Font('freesansbold.ttf', 25)
-    text = font.render("Score: " + str(len(snake) - 1), True, WHITE, BLACK)
+    text = font.render("Score: " + str(score), True, WHITE)
     text_rect = text.get_rect()
     text_rect.center = (screen.get_width() / 2, 25)
     screen.blit(text, text_rect)
@@ -153,7 +154,6 @@ def render_screen():
         write_message_to_screen('Paused. Press \'P\' to unpause')
 
     pg.display.update()
-    clock.tick(25)
 
 
 def start():
@@ -163,6 +163,7 @@ def start():
     while run:
         handle_events()
         render_screen()
+        clock.tick(25)
 
         if check_tail_collision() or check_wall_collision():
             render_border(RED)
@@ -206,24 +207,24 @@ def handle_events():
 
 
 def game_over():
-    decide = True
+    write_message_to_screen(
+        "Game over. Press ENTER to restart or ESC to exit")
+    pg.display.update()
 
-    while decide:
-        write_message_to_screen(
-            "Game over. Press ENTER to restart or ESC to exit")
-        pg.display.update()
-
+    deciding = True
+    while deciding:
+        clock.tick(10)
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                decide = False
+                deciding = False
                 break
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     reset_game()
-                    decide = False
+                    deciding = False
                     break
                 if event.key == pg.K_ESCAPE:
-                    decide = False
+                    deciding = False
                     break
 
 
