@@ -1,5 +1,5 @@
 import pygame as pg
-import random as r
+import random
 
 pg.init()
 
@@ -9,224 +9,225 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-# Start variables
+# Game variables
 screen = pg.display.set_mode((900, 600), pg.RESIZABLE)
+clock = pg.time.Clock()
 run = True
-direction = None
-offset = 30
 pause = False
-quit = False
 
 # Snake
-snakeHeadPosition = [300, 300]
-snake = [
-    snakeHeadPosition
-]
+snake_head_position = []
+snake = []
+snake_direction = None
+last_direction = None  # Used to store the last direction the snake was moving in
+offset = 30
 
-def renderSnake():   
+# Fruit
+fruit_position = []
+
+
+def reset_game():
+    global run, pause, snake_head_position, snake, snake_direction, last_direction, fruit_position
+
+    # Reset game variables
+    run = True
+    pause = False
+
+    # Reset snake variables
+    snake_head_position = [300, 300]
+    snake = [
+        snake_head_position, [snake_head_position[0] - offset, snake_head_position[1]], [
+            snake_head_position[0] - 2 * offset, snake_head_position[1]]
+    ]
+    snake_direction = None
+    last_direction = None
+
+    # Reset fruit variables
+    fruit_position = generate_fruit_position()
+
+
+def render_snake():
     for node in snake:
-        # Uses images of baymax to render snake (drawback is that it's slow)
-
-        # baymaxImg = pg.image.load("baymax_snake_head.png")
-        # # Scale down image
-        # baymaxImg = pg.transform.scale(baymaxImg, (30, 30))
-        # # Render image to screen
-        # screen.blit(baymaxImg, (node[0], node[1]))
-
         pg.draw.rect(screen, GREEN, (node[0], node[1], 30, 30))
 
 
+def generate_fruit_position():
+    while True:
+        x = random.randint(1, (screen.get_width() // offset) - 2) * offset
+        y = random.randint(1, (screen.get_height() // offset) - 2) * offset
 
-def generateFruitPosition():
-    x = 0
-    y = 0
-    while x <= 30 or x >= screen.get_width() - 30:
-        x = r.randint(0, ((screen.get_width() - 30) // 30)) * 30
-    while y <= 30 or y >= screen.get_height() - 30:
-        y = r.randint(0, ((screen.get_height() - 30) // 30)) * 30
+        if [x, y] not in snake:
+            break
 
     return [x, y]
 
 
-# Set initial fruit position
-fruitPosition = generateFruitPosition()
+def render_fruit():
+    pg.draw.rect(screen, RED, (fruit_position[0], fruit_position[1], 30, 30))
 
 
-def renderFruit():
-    fruitImg = pg.image.load('baymax_fruit.png')
-    # Scale down image
-    fruitImg = pg.transform.scale(fruitImg, (30, 30))
-    # Render image to screen
-    screen.blit(fruitImg, (fruitPosition[0], fruitPosition[1]))
+def move_snake(add_node):
+    global snake_head_position
 
+    if snake_direction is None:
+        return
 
-def moveSnake(addNode):
-    if direction == 'U':
-        snakeHeadPosition[1] -= offset
-    elif direction == 'D':
-        snakeHeadPosition[1] += offset
-    elif direction == 'R':
-        snakeHeadPosition[0] += offset
-    elif direction == 'L':
-        snakeHeadPosition[0] -= offset
+    new_head_position = list(snake_head_position)
 
-    # Adds new node as head
-    snake.insert(0, list(snakeHeadPosition))
+    if snake_direction == 'U':
+        new_head_position[1] -= offset
+    elif snake_direction == 'D':
+        new_head_position[1] += offset
+    elif snake_direction == 'R':
+        new_head_position[0] += offset
+    elif snake_direction == 'L':
+        new_head_position[0] -= offset
 
-    # If the snake has eaten the fruit, don't remove the tail
-    # Otherwise, remove the tail
-    # This simulates movement of the snake
-    if not addNode:
+    # Update the snake's head position
+    snake.insert(0, new_head_position)
+    snake_head_position = new_head_position
+
+    # If the snake has eaten the fruit, keep the tail to grow the snake
+    if not add_node:
         snake.pop()
 
 
-def checkFruitEaten():
-    # Retrieve value of fruitPosition
-    global fruitPosition
+def check_fruit_eaten():
+    global fruit_position
 
-    if snakeHeadPosition[0] == fruitPosition[0] and snakeHeadPosition[1] == fruitPosition[1]:
-        fruitPosition = generateFruitPosition()
-        renderFruit()
+    if snake_head_position[0] == fruit_position[0] and snake_head_position[1] == fruit_position[1]:
+        fruit_position = generate_fruit_position()
+        render_fruit()
         return True
     else:
         return False
 
 
-def checkWallCollision():
-    if snakeHeadPosition[0] <= 0 or snakeHeadPosition[0] >= screen.get_width() - 30 or snakeHeadPosition[1] <= 0 or snakeHeadPosition[1] >= screen.get_height() - 30:
+def check_wall_collision():
+    if snake_head_position[0] <= 0 or snake_head_position[0] >= screen.get_width() - 30 or snake_head_position[1] <= 0 or snake_head_position[1] >= screen.get_height() - 30:
         return True
     else:
         return False
 
 
-def checkTailCollision():
+def check_tail_collision():
     for i in range(1, len(snake)):
-        if snakeHeadPosition[0] == snake[i][0] and snakeHeadPosition[1] == snake[i][1]:
+        if snake_head_position[0] == snake[i][0] and snake_head_position[1] == snake[i][1]:
             return True
     return False
 
-# Writes message to center of screen
-def writeMessage(text):
+
+def write_message_to_screen(text):
     font = pg.font.Font('freesansbold.ttf', 32)
     text = font.render(text, True, BLACK, GREEN)
-    textRect = text.get_rect()
-    textRect.center = (screen.get_width() // 2, screen.get_height() // 2)
-    screen.blit(text, textRect)
+    text_rect = text.get_rect()
+    text_rect.center = (screen.get_width() // 2, screen.get_height() // 2)
+    screen.blit(text, text_rect)
 
 
-def showScore():
+def show_score():
     font = pg.font.Font('freesansbold.ttf', 25)
     text = font.render("Score: " + str(len(snake) - 1), True, WHITE, BLACK)
-    textRect = text.get_rect()
-    textRect.center = (screen.get_width() / 2, 25)
-    screen.blit(text, textRect)
+    text_rect = text.get_rect()
+    text_rect.center = (screen.get_width() / 2, 25)
+    screen.blit(text, text_rect)
 
 
-def renderBorder(color=GREEN):
+def render_border(color=GREEN):
     pg.draw.rect(screen, color, (0, 0, screen.get_width(), 5))
     pg.draw.rect(screen, color, (0, 0, 5, screen.get_height()))
-    pg.draw.rect(screen, color, (screen.get_width() - 5, 0, 5, screen.get_height()))
-    pg.draw.rect(screen, color, (0, screen.get_height() - 5, screen.get_width(), 5))
+    pg.draw.rect(screen, color, (screen.get_width() -
+                 5, 0, 5, screen.get_height()))
+    pg.draw.rect(screen, color, (0, screen.get_height() -
+                 5, screen.get_width(), 5))
 
 
-def renderScreen():
+def render_screen():
     screen.fill(BLACK)
-    renderSnake()
-    renderFruit()
-    renderBorder()
-    showScore()
+    render_snake()
+    render_fruit()
+    render_border()
+    show_score()
+
+    if pause:
+        write_message_to_screen('Paused. Press \'P\' to unpause')
+
     pg.display.update()
+    clock.tick(25)
+
 
 def start():
-    global direction, pause, snakeHeadPosition, snake, fruitPosition, run, quit
-    direction = None
-    pause = False
-    snakeHeadPosition = [300, 300]
-    snake = [
-        snakeHeadPosition
-    ]
-    fruitPosition = generateFruitPosition()
-    run = True
-    quit = False
+    global run
+    reset_game()
 
-# Part of pause feature
-lastDirection = None
+    while run:
+        handle_events()
+        render_screen()
 
-while run:
-    pg.time.delay(50)
+        if check_tail_collision() or check_wall_collision():
+            render_border(RED)
+            run = False
+            game_over()
+
+
+def handle_events():
+    global run, pause, snake_direction, last_direction
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            quit = True
             run = False
-            break
+            return
 
-    # Fix to issue where exit button doesn't work
-    if quit:
-        break
+    if snake_direction is not None:
+        last_direction = snake_direction
 
     keys = pg.key.get_pressed()
 
-    if not pause:
-        if keys[pg.K_UP] and direction != 'D':
-            direction = 'U'
-        elif keys[pg.K_DOWN] and direction != 'U':
-            direction = 'D'
-        elif keys[pg.K_RIGHT] and direction != 'L':
-            direction = 'R'
-        elif keys[pg.K_LEFT] and direction != 'R':
-            direction = 'L'
-
-    if direction is not None:
-        lastDirection = direction
-
-    if keys[pg.K_SPACE] and not pause:
-        direction = None
-        pause = True
-
     if keys[pg.K_p] and pause:
-        direction = lastDirection
+        snake_direction = last_direction
         pause = False
 
     if not pause:
-        moveSnake(checkFruitEaten())
-    else:
-        writeMessage('Paused. Press \'P\' to unpause')
+        if keys[pg.K_UP] and snake_direction != 'D':
+            snake_direction = 'U'
+        elif keys[pg.K_DOWN] and snake_direction != 'U':
+            snake_direction = 'D'
+        elif keys[pg.K_RIGHT] and snake_direction != 'L':
+            snake_direction = 'R'
+        elif keys[pg.K_LEFT] and snake_direction != 'R':
+            snake_direction = 'L'
+        elif keys[pg.K_SPACE]:
+            snake_direction = None
+            pause = True
+            return
+
+    add_node = check_fruit_eaten()
+    move_snake(add_node)
+
+
+def game_over():
+    decide = True
+
+    while decide:
+        write_message_to_screen(
+            "Game over. Press ENTER to restart or ESC to exit")
         pg.display.update()
-        continue
 
-    renderScreen()
-
-    # Check if hit tail
-    run = not checkTailCollision()
-    
-    # Check if hit wall
-    if run:
-        renderBorder(RED)
-        run = not checkWallCollision()
-
-    # Check for exit condition (to display game over message)
-    if not run:
-        decide = True
-
-        while decide:
-            writeMessage("Game over. Press ENTER to restart or ESC to exit")
-            pg.display.update()
-
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                decide = False
+                break
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    reset_game()
                     decide = False
                     break
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RETURN:
-                        decide = False
-                        start()
-                        break
-                    if event.key == pg.K_ESCAPE:
-                        decide = False
-                        break
+                if event.key == pg.K_ESCAPE:
+                    decide = False
+                    break
 
-if run:
+
+if __name__ == '__main__':
     start()
-else:
-    pg.quit()
+
+pg.quit()
