@@ -190,13 +190,13 @@ def handle_events():
         pause = False
 
     if not pause:
-        if keys[pg.K_UP] and snake_direction != 'D':
+        if (keys[pg.K_UP] or keys[pg.K_w]) and snake_direction != 'D':
             snake_direction = 'U'
-        elif keys[pg.K_DOWN] and snake_direction != 'U':
+        elif (keys[pg.K_DOWN] or keys[pg.K_s]) and snake_direction != 'U':
             snake_direction = 'D'
-        elif keys[pg.K_RIGHT] and snake_direction != 'L':
+        elif (keys[pg.K_RIGHT] or keys[pg.K_d]) and snake_direction != 'L':
             snake_direction = 'R'
-        elif keys[pg.K_LEFT] and snake_direction != 'R':
+        elif (keys[pg.K_LEFT] or keys[pg.K_a]) and snake_direction != 'R':
             snake_direction = 'L'
         elif keys[pg.K_SPACE]:
             snake_direction = None
