@@ -28,11 +28,12 @@ fruit_position = []
 
 
 def reset_game():
-    global run, pause, snake_head_position, snake, snake_direction, last_direction, fruit_position
+    global run, pause, snake_head_position, snake, snake_direction, last_direction, fruit_position, score
 
     # Reset game variables
     run = True
     pause = False
+    score = 0
 
     # Reset snake variables
     snake_head_position = [300, 300]
