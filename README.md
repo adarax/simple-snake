@@ -1,3 +1,15 @@
-# Python Snake
+# To Run
+1. Install Python 3 or higher on your system if you haven't already.
+2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the script:
+   ```bash
+   python main.py
+   ```
 
-This is a simple snake game written in Python using the Pygame library. Eventually I would like to make it Big-Hero 6 themed.
+# Controls
+- Use the arrow keys or WASD to move the snake.
+- Press the spacebar to pause the game.
+- All other controls are explained in the game.
