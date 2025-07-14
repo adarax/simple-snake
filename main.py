@@ -248,6 +248,8 @@ def move_snake():
     snake.insert(0, new_head_position)
     snake_head_position = new_head_position
 
+    if snake_direction is None:
+        return
 
 def check_fruit_eaten():
     global fruit_position, score
